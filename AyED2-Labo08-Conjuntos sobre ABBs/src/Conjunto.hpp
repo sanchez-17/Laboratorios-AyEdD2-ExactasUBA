@@ -49,12 +49,12 @@ void Conjunto<T>::insertar(const T& clave) {
 
 template <class T>
 void Conjunto<T>::remover(const T&) {
-    assert(false);
+    //assert(false);
 }
 
 template <class T>
 const T& Conjunto<T>::siguiente(const T& clave) {
-    assert(false);
+    //assert(false);
 }
 
 template <class T>
@@ -86,6 +86,6 @@ unsigned int Conjunto<T>::cardinal() const {
 
 template <class T>
 void Conjunto<T>::mostrar(std::ostream&) const {
-    assert(false);
+    //assert(false);
 }
 
