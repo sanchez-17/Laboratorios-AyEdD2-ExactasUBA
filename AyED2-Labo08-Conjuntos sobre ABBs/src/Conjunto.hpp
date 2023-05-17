@@ -58,7 +58,7 @@ void Conjunto<T>::remover(const T& clave) {
         actual = actual->valor < clave ? actual->der : actual->izq;
     }
     //Si el nodo a borrar es hoja:
-    if(actual == nullptr){
+    if(actual->izq == nullptr & actual->der == nullptr){
         if(padre->der->valor == clave){
             padre->der = nullptr;
             delete actual;
@@ -68,7 +68,9 @@ void Conjunto<T>::remover(const T& clave) {
             delete actual;
         }
     }else{
-        //El padre del nodo actual tiene 2 hijos
+        //El padre del nodo tiene un hijo
+        if(hijos(p))
+
     }
     _size--;
 }
@@ -95,7 +97,6 @@ const T& Conjunto<T>::maximo() const {
     Nodo* padre = nullptr;
     while(actual != nullptr){
         padre = actual;
-    //assert(false);
         actual = actual->der;
     }
     return padre->valor;
@@ -103,7 +104,7 @@ const T& Conjunto<T>::maximo() const {
 
 template <class T>
 unsigned int Conjunto<T>::cardinal() const {
-    //return _cardinal(0,_raiz);
+    //return _cardinal(0,_raiz); //solucion recursiva
     return this->_size;
 }
 
@@ -122,3 +123,10 @@ unsigned int Conjunto<T>::_cardinal(int count, Nodo* n) const{
     }
 }
 */
+template <class T>
+unsigned int Conjunto<T>:: _hijosInmediatos(Nodo* n) const{
+    unsigned int cant = 0;
+    cant = n->der != nullptr ? cant + 1 : cant;
+    cant = n->izq != nullptr ? cant + 1: cant;
+    return cant;
+}
