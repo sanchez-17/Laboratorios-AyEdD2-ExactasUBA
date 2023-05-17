@@ -53,10 +53,12 @@ void Conjunto<T>::remover(const T& clave) {
     //Nos posicionamos en el nodo que contiene al elemento y referenciamos al padre
     Nodo* actual = _raiz;
     Nodo* padre = nullptr;
+    //Busco el elemento a eliminar y lo guardo en actual
     while(actual->valor != clave){
         padre = actual;
         actual = actual->valor < clave ? actual->der : actual->izq;
     }
+
     //Si el nodo a borrar es hoja:
     if(actual->izq == nullptr & actual->der == nullptr){
         if(padre->der->valor == clave){
@@ -68,8 +70,17 @@ void Conjunto<T>::remover(const T& clave) {
             delete actual;
         }
     }else{
-        //El padre del nodo tiene un hijo
-        if(hijos(p))
+        if(_hijosInmediatos(actual) == 1){
+            if(padre->der->valor == clave){
+                padre->der = _unicoHijo(actual);
+                delete actual;
+            }else{
+                padre->izq = _unicoHijo(actual);
+                delete actual;
+            }
+        }else{//el nodo a eliminar tiene 2 hijos
+            
+        }
 
     }
     _size--;
@@ -129,4 +140,13 @@ unsigned int Conjunto<T>:: _hijosInmediatos(Nodo* n) const{
     cant = n->der != nullptr ? cant + 1 : cant;
     cant = n->izq != nullptr ? cant + 1: cant;
     return cant;
+}
+
+template <class T>
+unsigned int Conjunto<T>:: _unicoHijo(Nodo* n) const{
+    if(n->izq == nullptr){
+        return n->der;
+    }else{
+        return n->izq;
+    }
 }
