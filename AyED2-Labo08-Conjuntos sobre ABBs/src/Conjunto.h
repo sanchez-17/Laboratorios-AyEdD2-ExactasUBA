@@ -65,6 +65,7 @@ class Conjunto
         // Puntero a la raíz de nuestro árbol.
         Nodo* _raiz;
         unsigned int _size;
+        unsigned int _cardinal(int count, Nodo* n) const;
 
 };
 

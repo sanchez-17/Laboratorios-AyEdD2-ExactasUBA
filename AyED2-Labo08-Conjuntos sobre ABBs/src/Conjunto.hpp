@@ -103,6 +103,7 @@ const T& Conjunto<T>::maximo() const {
 
 template <class T>
 unsigned int Conjunto<T>::cardinal() const {
+    //return _cardinal(0,_raiz);
     return this->_size;
 }
 
@@ -111,3 +112,13 @@ void Conjunto<T>::mostrar(std::ostream&) const {
     //assert(false);
 }
 
+/*
+template <class T>
+unsigned int Conjunto<T>::_cardinal(int count, Nodo* n) const{
+    if(n->valor == nullptr){
+        return 0;
+    }else{
+        return count + _cardinal(count,n->izq) + _cardinal(count,n->der) + 1;
+    }
+}
+*/
