@@ -48,8 +48,29 @@ void Conjunto<T>::insertar(const T& clave) {
 }
 
 template <class T>
-void Conjunto<T>::remover(const T&) {
-    //assert(false);
+void Conjunto<T>::remover(const T& clave) {
+    //Pre: el elemento existe en el conjunto
+    //Nos posicionamos en el nodo que contiene al elemento y referenciamos al padre
+    Nodo* actual = _raiz;
+    Nodo* padre = nullptr;
+    while(actual->valor != clave){
+        padre = actual;
+        actual = actual->valor < clave ? actual->der : actual->izq;
+    }
+    //Si el nodo a borrar es hoja:
+    if(actual == nullptr){
+        if(padre->der->valor == clave){
+            padre->der = nullptr;
+            delete actual;
+        }
+        else{
+            padre->izq=nullptr;
+            delete actual;
+        }
+    }else{
+        //El padre del nodo actual tiene 2 hijos
+    }
+    _size--;
 }
 
 template <class T>
@@ -74,6 +95,7 @@ const T& Conjunto<T>::maximo() const {
     Nodo* padre = nullptr;
     while(actual != nullptr){
         padre = actual;
+    //assert(false);
         actual = actual->der;
     }
     return padre->valor;
