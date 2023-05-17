@@ -1,8 +1,6 @@
 
 template <class T>
-Conjunto<T>::Conjunto() {
-    // Completar
-}
+Conjunto<T>::Conjunto():_raiz(nullptr),_size(0) {}
 
 template <class T>
 Conjunto<T>::~Conjunto() { 
