@@ -67,7 +67,7 @@ class Conjunto
         unsigned int _size;
         unsigned int _cardinal(int count, Nodo* n) const;
         unsigned int _hijosInmediatos(Nodo* n) const;
-        unsigned int _unicoHijo(Nodo* n) const;
+        Nodo* _unicoHijo(Nodo* n) const;
 
 };
 
