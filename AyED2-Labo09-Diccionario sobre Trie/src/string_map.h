@@ -34,7 +34,7 @@ public:
     INSERT 
     * Inserta un par clave, valor en el diccionario
     **/
-    void insert(const pair<string, T>&);
+    void insert(const pair<string, T>& t);
 
     /**
     COUNT
@@ -83,7 +83,7 @@ private:
     struct Nodo {
         vector<Nodo*> siguientes;
         T* definicion;
-        Nodo(T* significado, vector<Nodo*> v) : definicion(significado), siguientes(v) {}
+        Nodo() : definicion(nullptr), siguientes(256, nullptr) {}
     };
 
     Nodo* raiz;

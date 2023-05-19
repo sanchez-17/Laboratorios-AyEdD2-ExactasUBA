@@ -3,7 +3,6 @@
 
 TEST(string_map_test, vacio) {
     string_map<int> vacio;
-
     EXPECT_TRUE(vacio.empty());
     EXPECT_EQ(vacio.count("hola"), 0);
 }
