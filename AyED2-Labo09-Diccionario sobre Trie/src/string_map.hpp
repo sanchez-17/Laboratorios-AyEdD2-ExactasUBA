@@ -20,20 +20,26 @@ void string_map<T>::insert(const pair<string, T>& t){
     if( raiz == nullptr){
         //defino un nuevo nodo en la raiz
         raiz = new Nodo;
+        _size++;
     }else{
         Nodo* actual =raiz;
         for(char c:clave){
             if(actual->siguientes[c] == nullptr){
                 actual->siguientes[c] = new Nodo;
+                _size++;
             }else{
                 actual = actual->siguientes[c];
             }
         }
         //LLegamos a la clave buscada
-        actual->definicion = new T;
-        *(actual->definicion) = t.second;
+
+        //Si no tiene definicion
+        if(actual->definicion == nullptr){
+            actual->definicion = new T;
+        }else{
+            *(actual->definicion) = t.second;
+        }
     }
-    _size++;
 }
 
 template <typename T>
@@ -66,7 +72,8 @@ const T& string_map<T>::at(const string& clave) const {
     for(char c:clave){
         actual = actual->siguientes[int(c)];
     }
-    return actual->definicion;
+    const Nodo* definicion = actual->definicion;
+    return definicion;
 }
 
 template <typename T>
