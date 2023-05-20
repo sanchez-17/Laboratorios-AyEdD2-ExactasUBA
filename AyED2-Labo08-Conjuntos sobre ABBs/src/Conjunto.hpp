@@ -110,17 +110,22 @@ void Conjunto<T>::remover(const T& clave) {
 template <class T>
 const T& Conjunto<T>::siguiente(const T& clave) {
     Nodo* actual = _raiz;
+    T siguiente = _raiz->valor;
     //Busco el elemento a  lo guardo en actual
     while(actual->valor != clave){
+        siguiente = actual->valor > clave ? actual->valor : siguiente;
         actual = actual->valor < clave ? actual->der : actual->izq;
     }
     //Por pre, el nodo de la clave tiene hijo derecho
-    actual = actual->der;
-    while(actual->izq != nullptr){
-        actual = actual->izq;
+    if(actual->der != nullptr){
+        actual = actual->der;
+        while(actual->izq != nullptr){
+            actual = actual->izq;
+        }
+        siguiente = actual->valor;
     }
 
-    return actual->valor;
+    return siguiente;
 }
 
 template <class T>
