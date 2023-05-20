@@ -50,36 +50,54 @@ void Conjunto<T>::insertar(const T& clave) {
 template <class T>
 void Conjunto<T>::remover(const T& clave) {
     if(pertenece(clave)){
-        //Nos posicionamos en el nodo que contiene al elemento y referenciamos al padre
-        Nodo* actual = _raiz;
-        Nodo* padre = nullptr;
-
-        //Busco el elemento a eliminar y lo guardo en actual
-        while(actual->valor != clave){
-            padre = actual;
-            actual = actual->valor < clave ? actual->der : actual->izq;
-        }
-
-        //Si el nodo a borrar es hoja:
-        if(actual->izq == nullptr & actual->der == nullptr){
-            if(padre->der->valor == clave){
-                padre->der = nullptr;
-                delete actual;
-            }
-            else{
-                padre->izq=nullptr;
-                delete actual;
-            }
+        //Si tiene un solo elemento, caso trivial:
+        if(cardinal()==1 && _raiz->valor == clave){
+            delete _raiz;
+            _raiz = nullptr;
         }else{
-            if(_hijosInmediatos(actual) == 1){
+            //Nos posicionamos en el nodo que contiene al elemento y referenciamos al padre
+            Nodo* actual = _raiz;
+            Nodo* padre = nullptr;
+
+            //Busco el elemento a eliminar y lo guardo en actual
+            while(actual->valor != clave){
+                padre = actual;
+                actual = actual->valor < clave ? actual->der : actual->izq;
+            }
+
+            //Si el nodo a borrar es hoja:
+            if(actual->izq == nullptr & actual->der == nullptr){
                 if(padre->der->valor == clave){
-                    padre->der = _unicoHijo(actual);
-                    delete actual;
-                }else{
-                    padre->izq = _unicoHijo(actual);
+                    padre->der = nullptr;
                     delete actual;
                 }
-            }else{//el nodo a eliminar tiene 2 hijos
+                else{
+                    padre->izq=nullptr;
+                    delete actual;
+                }
+            }else{
+                if(_hijosInmediatos(actual) == 1){
+                    if(padre->der->valor == clave){
+                        padre->der = _unicoHijo(actual);
+                        delete actual;
+                    }else{
+                        padre->izq = _unicoHijo(actual);
+                        delete actual;
+                    }
+                }else{//el nodo a eliminar tiene 2 hijos
+                    //Intercambiamos valores de min con actual, ó max con actual. A eleccion del consumidor: buscaremos el min.
+                    Nodo* min = actual->izq;
+                    while (min->der != nullptr){
+                        min = min->der;
+                    }
+                    //swapeo los valores
+                    actual->valor = actual->valor + min->valor;
+                    min->valor = actual->valor - min->valor;
+                    actual->valor = actual->valor - min->valor;
+
+                    remover(clave);
+
+                }
 
             }
 
@@ -91,7 +109,18 @@ void Conjunto<T>::remover(const T& clave) {
 
 template <class T>
 const T& Conjunto<T>::siguiente(const T& clave) {
-    //assert(false);
+    Nodo* actual = _raiz;
+    //Busco el elemento a  lo guardo en actual
+    while(actual->valor != clave){
+        actual = actual->valor < clave ? actual->der : actual->izq;
+    }
+    //Por pre, el nodo de la clave tiene hijo derecho
+    actual = actual->der;
+    while(actual->izq != nullptr){
+        actual = actual->izq;
+    }
+
+    return actual->valor;
 }
 
 template <class T>
