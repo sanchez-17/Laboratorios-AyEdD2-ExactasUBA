@@ -60,7 +60,7 @@ class Conjunto
         Nodo* _raiz;
         unsigned int _cardinal(int count, Nodo* n) const;
         void destruirDesde(Nodo* nodo);
-
+        void mostrarRecursivo(std::ostream& os, Nodo* nodo) const;
 };
 
 template<class T>

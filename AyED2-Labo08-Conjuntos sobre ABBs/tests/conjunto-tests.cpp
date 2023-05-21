@@ -106,6 +106,8 @@ TEST(conjunto_test, test_remover_caso_dos_hijos_raiz) {
     c.insertar(7);
     c.insertar(6);
     c.insertar(8);
+    //Mostramos el arbol
+    c.mostrar(std::cout);
     c.remover(5);
     EXPECT_EQ(c.cardinal(), 4);
 }
@@ -137,6 +139,7 @@ TEST(conjunto_test, test_siguiente_inorder) {
     c.insertar(24);
     c.insertar(22);
     c.insertar(25);
+
 
     EXPECT_EQ(c.siguiente(20), 22);
     EXPECT_EQ(c.siguiente(4), 5);
