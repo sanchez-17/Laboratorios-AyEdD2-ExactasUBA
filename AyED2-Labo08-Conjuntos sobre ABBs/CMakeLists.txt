@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.17)
 project(taller_abb)
 
 # Algunos flags para pasar al compilador (gnu++11 en vez de c++11 para que sea cross-plat)

@@ -1,111 +1,113 @@
-
 template <class T>
-Conjunto<T>::Conjunto():_raiz(nullptr),_size(0) {}
+Conjunto<T>::Conjunto():_raiz(nullptr) {}
 
 template <class T>
 Conjunto<T>::~Conjunto() { 
-    // Completar
+    destruirDesde(_raiz);
+}
+
+template<class T>
+void Conjunto<T>::destruirDesde(Nodo* nodo){
+    if(nodo != nullptr){
+        destruirDesde(nodo->izq);
+        destruirDesde(nodo->der);
+        delete nodo;
+    }
 }
 
 template <class T>
 bool Conjunto<T>::pertenece(const T& clave) const {
-    bool res = false;
     Nodo* actual = _raiz;
-    while (actual != nullptr && !res){
-        if(actual->valor == clave){
-            res = true;
-        }else{
-            actual = clave > actual->valor ? actual->der : actual->izq;
-        }
+    while (actual != nullptr && actual->valor != clave){
+        actual = clave > actual->valor ? actual->der : actual->izq;
+    }
+    bool res;
+    if(actual == nullptr){
+        res = false;
+    }else{
+        res = true;
     }
     return res;
 }
 
 template <class T>
 void Conjunto<T>::insertar(const T& clave) {
-    if(!pertenece(clave)){
-        //Buscamos donde insertar
-        Nodo* actual = _raiz;
-        Nodo* padre = nullptr;
-        //Al finalizar el while padre sera el ultimo nodo de la busqueda
-        while(actual != nullptr){
-            padre = actual;
-            actual = actual->valor > clave ? actual->izq : actual->der;
-        }
-        //Creamos el nodo nuevo a insertar con clave como valor
-        Nodo* nuevo = new Nodo(clave);
-        if(padre == nullptr){
-            _raiz = nuevo;
+    if(pertenece(clave)) return;
+    //Buscamos donde insertar
+    Nodo* actual = _raiz;
+    Nodo* padre = nullptr;
+    //Al finalizar el while padre sera el ultimo nodo de la busqueda
+    while(actual != nullptr){
+        padre = actual;
+        actual = actual->valor > clave ? actual->izq : actual->der;
+    }
+    //Creamos el nodo nuevo a insertar con clave como valor
+    Nodo* nuevo = new Nodo(clave);
+    if(padre == nullptr){
+        _raiz = nuevo;
+    }else{
+        if(padre->valor > clave){
+            padre->izq = nuevo;
         }else{
-            if(padre->valor > clave){
-                padre->izq = nuevo;
-            }else{
-                padre->der = nuevo;
-            }
+            padre->der = nuevo;
         }
-        _size++;
     }
 }
 
 template <class T>
 void Conjunto<T>::remover(const T& clave) {
-    if(pertenece(clave)){
-        //Si tiene un solo elemento, caso trivial:
-        if(cardinal()==1 && _raiz->valor == clave){
-            delete _raiz;
-            _raiz = nullptr;
-        }else{
-            //Nos posicionamos en el nodo que contiene al elemento y referenciamos al padre
-            Nodo* actual = _raiz;
-            Nodo* padre = nullptr;
+    //Nos posicionamos en el nodo que contiene al elemento y referenciamos al padre
+    if(!pertenece(clave)) return;
 
-            //Busco el elemento a eliminar y lo guardo en actual
-            while(actual->valor != clave){
-                padre = actual;
-                actual = actual->valor < clave ? actual->der : actual->izq;
-            }
+    Nodo* actual = _raiz;
+    Nodo* padre = nullptr;
 
-            //Si el nodo a borrar es hoja:
-            if(actual->izq == nullptr & actual->der == nullptr){
-                if(padre->der->valor == clave){
-                    padre->der = nullptr;
-                    delete actual;
-                }
-                else{
-                    padre->izq=nullptr;
-                    delete actual;
-                }
-            }else{
-                if(_hijosInmediatos(actual) == 1){
-                    if(padre->der->valor == clave){
-                        padre->der = _unicoHijo(actual);
-                        delete actual;
-                    }else{
-                        padre->izq = _unicoHijo(actual);
-                        delete actual;
-                    }
-                }else{//el nodo a eliminar tiene 2 hijos
-                    //Intercambiamos valores de min con actual, ó max con actual. A eleccion del consumidor: buscaremos el min.
-                    Nodo* min = actual->izq;
-                    while (min->der != nullptr){
-                        min = min->der;
-                    }
-                    //swapeo los valores
-                    actual->valor = actual->valor + min->valor;
-                    min->valor = actual->valor - min->valor;
-                    actual->valor = actual->valor - min->valor;
-
-                    remover(clave);
-
-                }
-
-            }
-
-        }
-        _size--;
+    //Busco el elemento a eliminar y lo guardo en actual
+    while(actual->valor != clave){
+        padre = actual;
+        actual = actual->valor < clave ? actual->der : actual->izq;
     }
 
+    //si tiene 2 hijos
+    if(actual->izq != nullptr && actual->der != nullptr){
+        //Intercambiamos valores del predecesor con actual, ó sucesor con actual. A eleccion del consumidor: buscaremos el min.
+        Nodo* pred = actual->izq;
+        while (pred->der != nullptr){
+            pred = pred->der;
+        }
+        T pred_inmediato = pred->valor;
+        remover(pred_inmediato);
+        actual->valor = pred_inmediato;
+    }//nodo actual tiene tiene 1 hijo
+    else if(actual->izq != nullptr || actual->der != nullptr){
+        Nodo* hijo = actual->izq != nullptr ? actual->izq : actual->der;
+        //caso es raiz y tiene un hijo, padre es nullptr
+        if(actual == _raiz){
+            _raiz = hijo;
+        }else{//no es raiz
+            if(padre->der != nullptr && padre->der->valor == clave){
+                padre->der = hijo;
+            }else{
+                padre->izq = hijo;
+            }
+        }
+        delete actual;
+    }
+    else{//nodo actual es hoja
+        if(actual == _raiz){//Si es la raiz
+            _raiz = nullptr;
+        }else{
+            if(padre->der == actual){
+                padre->der = nullptr;
+            }
+            else{
+                padre->izq=nullptr;
+            }
+        }
+        delete actual;
+    }
 }
+
 
 template <class T>
 const T& Conjunto<T>::siguiente(const T& clave) {
@@ -152,38 +154,18 @@ const T& Conjunto<T>::maximo() const {
 
 template <class T>
 unsigned int Conjunto<T>::cardinal() const {
-    //return _cardinal(0,_raiz); //solucion recursiva
-    return this->_size;
+    return _cardinal(0,_raiz);
 }
 
-template <class T>
-void Conjunto<T>::mostrar(std::ostream&) const {
-    //assert(false);
-}
-
-/*
 template <class T>
 unsigned int Conjunto<T>::_cardinal(int count, Nodo* n) const{
-    if(n->valor == nullptr){
+    if(n == nullptr){
         return 0;
     }else{
         return count + _cardinal(count,n->izq) + _cardinal(count,n->der) + 1;
     }
 }
-*/
 template <class T>
-unsigned int Conjunto<T>:: _hijosInmediatos(Nodo* n) const{
-    unsigned int cant = 0;
-    cant = n->der != nullptr ? cant + 1 : cant;
-    cant = n->izq != nullptr ? cant + 1: cant;
-    return cant;
-}
-
-template <class T>
-typename Conjunto<T>::Nodo* Conjunto<T>::_unicoHijo(Nodo* n) const{
-    if(n->izq == nullptr){
-        return n->der;
-    }else{
-        return n->izq;
-    }
+void Conjunto<T>::mostrar(std::ostream&) const {
+    //assert(false);
 }

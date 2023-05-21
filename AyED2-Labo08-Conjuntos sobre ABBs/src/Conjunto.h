@@ -46,10 +46,6 @@ class Conjunto
 
     private:
 
-        /**
-         * Completar con lo que sea necesario...
-         **/
-
         struct Nodo
         {
             // El elemento al que representa el nodo.
@@ -61,13 +57,9 @@ class Conjunto
             // El constructor, toma el elemento al que representa el nodo.
             Nodo(const T& v):valor(v),izq(nullptr),der(nullptr){}
         };
-
-        // Puntero a la raíz de nuestro árbol.
         Nodo* _raiz;
-        unsigned int _size;
-        //unsigned int _cardinal(int count, Nodo* n) const;
-        unsigned int _hijosInmediatos(Nodo* n) const;
-        Nodo* _unicoHijo(Nodo* n) const;
+        unsigned int _cardinal(int count, Nodo* n) const;
+        void destruirDesde(Nodo* nodo);
 
 };
 
