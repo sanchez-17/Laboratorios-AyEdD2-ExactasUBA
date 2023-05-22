@@ -126,5 +126,5 @@ int string_map<T>::size() const{
 
 template <typename T>
 bool string_map<T>::empty() const{
-    // COMPLETAR
+    return _raiz == nullptr;
 }
