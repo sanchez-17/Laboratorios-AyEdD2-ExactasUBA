@@ -6,7 +6,14 @@ string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this =
 
 template <typename T>
 string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
-    // COMPLETAR
+    _size = d._size;
+    _raiz = d._raiz;
+    
+    Nodo* actual = d._raiz;
+    for(Nodo* p:d._raiz->siguientes){
+        copiarNodo(p,_raiz->siguientes);
+    }
+
 }
 
 template <typename T>
