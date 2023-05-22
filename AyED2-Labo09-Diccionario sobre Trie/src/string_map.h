@@ -86,7 +86,7 @@ private:
         Nodo() : definicion(nullptr), siguientes(256, nullptr) {}
     };
 
-    Nodo* raiz;
+    Nodo* _raiz;
     int _size;
 };
 

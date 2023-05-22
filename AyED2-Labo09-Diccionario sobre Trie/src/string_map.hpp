@@ -17,8 +17,8 @@ template <typename T>
 void string_map<T>::insert(const pair<string, T>& t){
     string clave = t.first;
     //recorremos el trie hasta hallar la clave completa
-    if( raiz == nullptr){
-        //defino un nuevo nodo en la raiz
+    if( _raiz == nullptr){
+        //defino un nuevo nodo en la _raiz
         raiz = new Nodo;
         _size++;
     }else{
@@ -47,18 +47,20 @@ T& string_map<T>::operator[](const string& clave){}
 
 template <typename T>
 int string_map<T>::count(const string& clave) const{
-    if( raiz == nullptr){
-        return 0;
-    }else{
-        Nodo* actual =raiz;
-        for(char i:clave){
-            if(actual->siguientes[int(i)] == nullptr){
-                return 0;
-            }else{
-                actual = actual->siguientes[int(i)];
-            }
+    Nodo* actual = _raiz;
+    //Empezamos la raiz como nodo actual, si no esta definida devolvemos false
+    if(actual == nullptr)return 0;
+    //recorremos el trie mirando cada caracter de la clave
+    for(char i:clave){
+        //Si en siguiente del nodo actual el caracter apunta a nullptr, false. Sino consideramos el siguiente caracter de la clave y vemos el nodo al que apunta en siguientes
+        if(actual->siguientes[int(i)] == nullptr){
+            return 0;
+        }else{
+            actual = actual->siguientes[int(i)];
         }
-        if(actual->definicion != nullptr){
+    }
+    //Llegamos al nodo buscado, la clave esta definida si el significado esta defindida
+    if(actual->definicion != nullptr){
             return 1;
         }else{
             return 0;
