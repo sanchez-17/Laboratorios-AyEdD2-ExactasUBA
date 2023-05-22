@@ -1,5 +1,5 @@
 template <typename T>
-string_map<T>::string_map() : _size(0), raiz(new Nodo){}
+string_map<T>::string_map() : _size(0), _raiz(new Nodo){}
 
 template <typename T>
 string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this = aCopiar; } // Provisto por la catedra: utiliza el operador asignacion para realizar la copia.
@@ -15,32 +15,23 @@ string_map<T>::~string_map(){
 }
 template <typename T>
 void string_map<T>::insert(const pair<string, T>& t){
-    string clave = t.first;
     //recorremos el trie hasta hallar la clave completa
-    if( _raiz == nullptr){
-        //defino un nuevo nodo en la _raiz
-        raiz = new Nodo;
-        _size++;
-    }else{
-        Nodo* actual =raiz;
-        for(char c:clave){
-            if(actual->siguientes[c] == nullptr){
-                actual->siguientes[c] = new Nodo;
-                _size++;
-            }else{
-                actual = actual->siguientes[c];
-            }
-        }
-        //LLegamos a la clave buscada
-
-        //Si no tiene definicion
-        if(actual->definicion == nullptr){
-            actual->definicion = new T;
+    if(_raiz == nullptr) _raiz = new Nodo; _size++;
+    Nodo* actual = _raiz;
+    //Recorremos el trie, si el nodo no esta definido. Lo creamos
+    for(char c:t.first){
+        if(actual->siguientes[c] == nullptr){
+            actual->siguientes[c] = new Nodo;
+            _size++;
         }else{
-            *(actual->definicion) = t.second;
+            actual = actual->siguientes[c];
         }
     }
+    //LLegamos a la clave buscada, si el significado no esta definido. Lo definimos
+    if(actual->definicion == nullptr) actual->definicion = new T;
+    *(actual->definicion) = t.second;
 }
+
 
 template <typename T>
 T& string_map<T>::operator[](const string& clave){}
@@ -70,7 +61,7 @@ int string_map<T>::count(const string& clave) const{
 
 template <typename T>
 const T& string_map<T>::at(const string& clave) const {
-    Nodo* actual =raiz;
+    Nodo* actual = _raiz;
     for(char c:clave){
         actual = actual->siguientes[int(c)];
     }
@@ -80,7 +71,7 @@ const T& string_map<T>::at(const string& clave) const {
 
 template <typename T>
 T& string_map<T>::at(const string& clave) {
-    Nodo* actual =raiz;
+    Nodo* actual = _raiz;
     for(char c:clave){
         actual = actual->siguientes[c];
     }
