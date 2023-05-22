@@ -1,5 +1,5 @@
 template <typename T>
-string_map<T>::string_map() : _size(0), _raiz(new Nodo){}
+string_map<T>::string_map() : _size(0), _raiz(nullptr){}
 
 template <typename T>
 string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this = aCopiar; } // Provisto por la catedra: utiliza el operador asignacion para realizar la copia.
@@ -16,20 +16,18 @@ string_map<T>::~string_map(){
 template <typename T>
 void string_map<T>::insert(const pair<string, T>& t){
     //recorremos el trie hasta hallar la clave completa
-    if(_raiz == nullptr) _raiz = new Nodo; _size++;
+    if(_raiz == nullptr) _raiz = new Nodo;
     Nodo* actual = _raiz;
     //Recorremos el trie, si el nodo no esta definido. Lo creamos
     for(char c:t.first){
-        if(actual->siguientes[c] == nullptr){
-            actual->siguientes[c] = new Nodo;
-            _size++;
-        }else{
-            actual = actual->siguientes[c];
-        }
+        if(actual->siguientes[c] == nullptr) actual->siguientes[c] = new Nodo;
+        actual = actual->siguientes[c];
     }
     //LLegamos a la clave buscada, si el significado no esta definido. Lo definimos
     if(actual->definicion == nullptr) actual->definicion = new T;
-    *(actual->definicion) = t.second;
+    T def = t.second;
+    *(actual->definicion) = def;
+    _size++;
 }
 
 
@@ -52,11 +50,11 @@ int string_map<T>::count(const string& clave) const{
     }
     //Llegamos al nodo buscado, la clave esta definida si el significado esta defindida
     if(actual->definicion != nullptr){
-            return 1;
-        }else{
-            return 0;
-        }
+        return 1;
+    }else{
+        return 0;
     }
+
 }
 
 template <typename T>
