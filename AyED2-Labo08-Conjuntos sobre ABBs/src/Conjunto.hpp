@@ -170,15 +170,15 @@ unsigned int Conjunto<T>::_cardinal(int count, Nodo* n) const{
 
 template <class T>
 void Conjunto<T>::mostrar(std::ostream& os) const {
-    // Llamada a una función auxiliar recursiva para mostrar los elementos en orden
+    //Mostramos los elementos en orden
     mostrarRecursivo(os, _raiz);
 }
 
 template <class T>
 void Conjunto<T>::mostrarRecursivo(std::ostream& os, Nodo* nodo) const {
     if (nodo != nullptr) {
-        // Recorrido in-order: primero mostramos el subárbol izquierdo,
-        // luego el nodo actual y finalmente el subárbol derecho
+        // Recorrido in-order: primero mostramos el subarbol izquierdo,
+        // luego el nodo actual y finalmente el subarbol derecho
         mostrarRecursivo(os, nodo->izq);
         os << nodo->valor << " ";
         mostrarRecursivo(os, nodo->der);
