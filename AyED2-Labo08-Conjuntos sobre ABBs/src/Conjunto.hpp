@@ -23,13 +23,7 @@ bool Conjunto<T>::pertenece(const T& clave) const {
     while (actual != nullptr && actual->valor != clave){
         actual = clave > actual->valor ? actual->der : actual->izq;
     }
-    bool res;
-    if(actual == nullptr){
-        res = false;
-    }else{
-        res = true;
-    }
-    return res;
+    return !(actual == nullptr);
 }
 
 template <class T>

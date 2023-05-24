@@ -1,3 +1,4 @@
+
 #ifndef STRING_MAP_H_
 #define STRING_MAP_H_
 
@@ -86,8 +87,9 @@ private:
         Nodo() : definicion(nullptr), siguientes(256, nullptr) {}
     };
 
-    Nodo* raiz;
+    Nodo* _raiz;
     int _size;
+    int cantHijos(Nodo* n);
 };
 
 #include "string_map.hpp"
