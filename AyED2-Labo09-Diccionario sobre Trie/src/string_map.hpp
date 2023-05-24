@@ -18,8 +18,21 @@ string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
 
 template <typename T>
 string_map<T>::~string_map(){
-
+    borrarDesde(_raiz);
+    _size = 0;
 }
+
+template <typename T>
+void string_map<T>::borrarDesde(Nodo* nodo){
+    if(nodo == nullptr)return;
+    if(nodo->definicion != nullptr)delete nodo->definicion;
+    for(Nodo* p: nodo->siguientes){
+        borrarDesde(p);
+    }
+    delete nodo;
+}
+
+
 template <typename T>
 void string_map<T>::insert(const pair<string, T>& t){
     //recorremos el trie hasta hallar la clave completa

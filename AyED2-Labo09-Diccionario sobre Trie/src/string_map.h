@@ -89,7 +89,8 @@ private:
 
     Nodo* _raiz;
     int _size;
-    int cantHijos(Nodo* n);
+    int cantHijos(Nodo* nodo);
+    void borrarDesde(Nodo* nodo);
 };
 
 #include "string_map.hpp"
