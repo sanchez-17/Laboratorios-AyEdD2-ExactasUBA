@@ -100,7 +100,7 @@ TEST(string_map_test, copiar) {
 	EXPECT_TRUE(copia.count("chau") == 1);
 	EXPECT_TRUE(copia.count("adios") == 1);
 
-	EXPECT_FALSE(copia.count("h") == 1);
+    EXPECT_FALSE(copia.count("h") == 1);
 	EXPECT_FALSE(copia.count("ho") == 1);
 	EXPECT_FALSE(copia.count("hol") == 1);
 

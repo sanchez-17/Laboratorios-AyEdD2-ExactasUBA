@@ -6,20 +6,28 @@ string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this =
 
 template <typename T>
 string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
-    _size = d._size;
-    _raiz = d._raiz;
-    
-    Nodo* actual = d._raiz;
-    for(Nodo* p:d._raiz->siguientes){
-        copiarNodo(p,_raiz->siguientes);
+    buscarYCopiarSignificado(this,d._raiz,"");
+}
+template<typename T>
+void string_map<T>::buscarYCopiarSignificado(string_map<T>* s,Nodo* p,string clave){
+    if(clave == "")this->_raiz = p;
+    if(p== nullptr)return;
+    if(p->definicion != nullptr){
+        pair<string, T> t = make_pair(clave,*p->definicion);
+        this->insert(t);
     }
-
+    for (int i=97;i<123;i++){
+        if(cantHijos(p)!=0){
+            buscarYCopiarSignificado(this,p->siguientes[i],clave + char(i));
+        }
+    }
 }
 
 template <typename T>
 string_map<T>::~string_map(){
     borrarDesde(_raiz);
     _size = 0;
+    _raiz = nullptr;
 }
 
 template <typename T>
@@ -67,12 +75,7 @@ int string_map<T>::count(const string& clave) const{
         }
     }
     //Llegamos al nodo buscado, la clave esta definida si el significado esta defindida
-    if(actual->definicion != nullptr){
-        return 1;
-    }else{
-        return 0;
-    }
-
+    return actual->definicion != nullptr ? 1 : 0;
 }
 
 template <typename T>
