@@ -91,7 +91,8 @@ private:
     int _size;
     int cantHijos(Nodo* nodo);
     void borrarDesde(Nodo* nodo);
-    void buscarYCopiarSignificado(string_map<T>* s,Nodo* p,string clave);
+    void copiarDesde(Nodo* n, Nodo* d);
+    //void buscarYCopiarSignificado(string_map<T>* s,Nodo* p,string clave);
 };
 
 #include "string_map.hpp"

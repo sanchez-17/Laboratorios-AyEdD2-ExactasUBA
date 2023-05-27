@@ -6,8 +6,33 @@ string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this =
 
 template <typename T>
 string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
-    buscarYCopiarSignificado(this,d._raiz,"");
+    //borramos todo lo que habia antes y creamos un nuevo nodo a partir del cual vamos a copiar
+    borrarDesde(_raiz);
+    _raiz = new Nodo();
+    _size = d.size();
+    if(d.size() > 0) copiarDesde(_raiz,d._raiz);
+    return *this;
+//    buscarYCopiarSignificado(this,d._raiz,"");
 }
+
+template<typename T>
+void string_map<T>::copiarDesde(Nodo* n,Nodo* d){
+    for(int i = 0;i<255;i++){
+        //Si el nodo siguiente es valido, creo un nuevo nodo copia de este
+        if(d->siguientes[i] != nullptr){
+            Nodo* nuevo = new Nodo();
+            if(d->siguientes[i]->definicion != nullptr){
+                T* def = new T(*d->siguientes[i]->definicion);
+                nuevo->definicion = def;
+            }
+            n->siguientes[i] = nuevo;
+            copiarDesde(n->siguientes[i],d->siguientes[i]);
+        }
+    }
+
+}
+
+/*
 template<typename T>
 void string_map<T>::buscarYCopiarSignificado(string_map<T>* s,Nodo* p,string clave){
     if(clave == "")this->_raiz = p;
@@ -22,6 +47,7 @@ void string_map<T>::buscarYCopiarSignificado(string_map<T>* s,Nodo* p,string cla
         }
     }
 }
+ */
 
 template <typename T>
 string_map<T>::~string_map(){
