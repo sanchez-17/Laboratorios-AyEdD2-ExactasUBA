@@ -1,1 +1,88 @@
-#Guia 4.ejercicio 1:
+#Guia 4.
+*** Ejercicio 1:
+
+*Diseñar el TAD MULTICONJUNTO(NAT) utilizando listas enlazadas de naturales.
+=========
+Interfaz
+========
+interfaz Multiconjunto
+	usa : nat,bool
+	se explica con: Multiconjunto(nat)
+	genero:multiconj(nat)
+	===========
+	operaciones
+	===========
+	VACIO()->res:multiconj(nat)
+	pre={true}
+	post={res = Ø}
+	
+	AGREGAR(in α:nat,in/out C:multiconj(nat))
+	pre={C = C_0}
+	post={res = Ø}
+
+===============================================================================================
+ Ejercicio 5:
+
+*Diseñe un modulo para el TAD MATRIZ FINITA de modo tal que dadas dos matrices dadas A y B.
+	-Definir y Obtener aplicadas a A se realicen cada una en θ(n) en peor caso.
+	-SumarMatrices aplicada a A y B se realice en θ(n+m) en peor caso.
+n y m son la cantidad de elementos no nulos de A y B, respectivamente.
+=========
+representacion de la estructura
+=========
+MATRIZ FINITA se representa con estr
+	donde estr es tupla<
+			    filas            : nat,
+			    cols             : nat,
+			    elementosNoNulos : lista(tuplas(fila:nat,col:nat,valor:nat))
+			   >
+
+rep: estr e -> boolean
+∀(e:estr)
+Rep(e) = true sii ∀(t:tupla de eso)(t ∈  e.elementosNoNulos ⇒  "ordenadas por fila y luego por columna")
+"fila y col de cada tupla en rango"
+"no debe haber tuplas con coordenadas repetidas"
+
+===========
+operaciones
+===========
+iCrear(in i:nat,in j:nat)->res:Matriz(nat)
+	e.filas = i
+	e.cols = j
+	//Asumo que las matrices se inicializan sin elementos
+	e.elementosNoNulos = vacia()
+
+i#Filas(in m:Matriz)-> res:nat
+	res = m.filas
+
+i#Columnas(in m:Matriz)-> res:nat
+	res = m.cols
+
+iDefinir(in/out m:Matriz,in i:nat,in j:nat,in val:nat)
+	//Verifico si i y j estan en rango
+	//Busco en e.elementosNoNulos la tupla que contiene la coordenada
+	//Sino esta, creo la tupla.
+	//si si esta, la modifico.
+	//listo
+
+iSumar(in A:Matriz,in B:matriz,in i:nat,in j:nat,in val:nat)->res : Matriz
+	//En la pre pido que A y B tengan igual dimension
+	//Suma coordenada a coordenada
+	//Agarro A.lista y la itero
+	//
+	C = crear(A.filas,A.cols)
+	itA = crearIt(A.lista)
+	itB = crearIt(B.lista)
+	while(haySiguiente(itA) && haySiguiente(itB))
+		if( siguiente(itA).fila < siguiente(itB).fila || (siguiente(itA).fila == siguiente(itB).fila && siguiente(itA).col < siguiente(itB).col) )
+			definir(C,siguientes(itA).filas,siguientes(itA).cols,siguientes(itA).valor)
+			avanzar(itA)
+		else if( siguiente(itB).fila < siguiente(itA).fila || (siguiente(itB).fila == siguiente(itA).fila && siguiente(itB).col < siguiente(itA).col) )
+			definir(C,siguientes(itB).filas,siguientes(itB).cols,siguientes(itB).valor)
+			avanzar(itB)
+		)
+			
+	
+
+ 
+
