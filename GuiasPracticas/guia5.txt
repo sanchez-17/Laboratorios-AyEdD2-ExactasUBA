@@ -1,0 +1,49 @@
+1) esMasIzquierda(in A:array[0...n]) -> res:bool {
+      //Caso base
+      if |A| = 2 then                                                                                                 O(1)
+        return A[0]>A[1]                                                                                              O(1)
+      
+      //Dividir
+        res = ( suma(A[0...n/2]) > suma(A[n/2...n] )  ʌ esMasIzquierda(A[0...n/2])  ʌ esMasIzquierda(A[n/2...n])      O(n/2+n/2) + 2 T(n/2)
+  }        
+        
+        T(n) = 2 T(n/2) + O(n)
+        c = 2, a = 2, f(n)= n
+        * n^( log_c(a) ) = n, ¿ f(n) ∈ O( n^(1-e) ) ? false  
+        * cumple 2 condicion 
+        => T(n) = θ(n.log(n))
+
+2) hayElementoPos(in A:array[1...n],in i:nat, in j:nat)->res: bool {
+        //caso base
+        m = n/2                                                                                                       O(1)
+        if(|A| = 1)                                                                                                   O(1)
+          return (m=A[m])                                                                                             O(1)
+        else
+          if m > A[m]                                                                                                 O(1)
+            //Dividir 
+            return hayElementoPos(A,0,n/2)                                                                            T(n/2)
+          else
+            return hayElementoPos(A,n/2,n)                                                                            T(n/2)
+          
+   }
+   
+   T(n) = T(n/2) + O(1)
+   c = 2, a = 1, f(n)= 1
+        * n^( log_c(a) ) = 1, ¿ f(n) ∈ O( n^(-e) ) ? false  
+        * cumple 2 condicion 
+        => T(n) = θ(log(n))
+
+3) calcularPot(in a:nat, in b:nat ) -> res: nat {
+      if b = 1 then                                                                                                         O(1)
+         res = a 
+      else
+           if (b mod 2 = 0) then  res = calcularPot(a,b/2) * calcularPot(a,b/2)                                             T(b/2)
+           else                   res = calcularPot(a,(b-1)/2) * calcularPot(a,(b-1)/2) * a                                 T(b/2)
+      
+    }
+     T(b) =  T(b/2) + O(1)
+        c = 2, a = 1, f(n)= 1
+        * n^( log_c(a) ) = 1
+          ¿ f(n) ∈ O( n^(1-e) ) ? false  
+        * cumple 2 condicion 
+        => T(b) = θ(log(b))
