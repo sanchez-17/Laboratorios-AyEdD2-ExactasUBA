@@ -111,9 +111,14 @@ public:
     private:
         // Constructor por defecto del iterador.
         // (Nota: puede construir un iterador inválido).
-        iterator();
+        Nodo* _actual;
+        //T _valor;
+        iterator(Nodo* actual);
+        vector<Nodo*> _padres;
+        vector<Nodo*> _ultPadresValidos;
 
         // COMPLETAR
+
     };
 
     // Devuelve un iterador válido al principio de la taxonomía.

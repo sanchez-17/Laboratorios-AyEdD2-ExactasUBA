@@ -81,33 +81,39 @@ void Taxonomia<T>::mostrar(ostream& os) const {
 // Devuelve un iterador válido al principio de la taxonomía.
 template<class T>
 typename Taxonomia<T>::iterator Taxonomia<T>::begin() {
-    return Taxonomia<T>::iterator();
+    return iterator(_raiz); //Taxonomia<T>::iterator()
 }
 
 // Devuelve un iterador válido al final de la taxonomía.
 template<class T>
 typename Taxonomia<T>::iterator Taxonomia<T>::end() {
-    return Taxonomia<T>::iterator();
+    return Taxonomia<T>::iterator(nullptr);
 }
 
 // Constructor por defecto del iterador.
 // (Nota: puede construir un iterador inválido).
 template<class T>
-Taxonomia<T>::iterator::iterator() {
+Taxonomia<T>::iterator::iterator(Nodo* actual) : _actual(actual), _padres(vector<Nodo*>()), _ultPadresValidos(vector<Nodo*>())/*, _valor(actual->valor)*/ {
 }
 
 // Referencia mutable al nombre de la categoría actual.
 // Pre: el iterador está posicionado sobre una categoría.
 template<class T>
 T& Taxonomia<T>::iterator::operator*() const {
-    return *(new T());
+    return *(new T(_actual->valor));
 }
 
 // Cantidad de subcategorías de la categoría actual.
 // Pre: el iterador está posicionado sobre una categoría.
 template<class T>
 int Taxonomia<T>::iterator::cantSubcategorias() const {
-    return -1;
+    int cant = 0;
+    for(Nodo* n : _actual->hijos){
+        if(n != nullptr){
+            cant++;
+        }
+    }
+    return cant;
 }
 
 // Ubica el iterador sobre la i-ésima subcategoría.
@@ -115,13 +121,21 @@ int Taxonomia<T>::iterator::cantSubcategorias() const {
 // y además 0 <= i < cantSubcategorias().
 template<class T>
 void Taxonomia<T>::iterator::subcategoria(int i) {
+    int index = 0;
+    for(Nodo* n : _actual->hijos){
+        if(i == index){
+            _padres.push_back(_actual);
+            _actual = n;
+        }
+        index++;
+    }
 }
 
 // Devuelve true sii la categoría actual es la raíz. 
 // Pre: el iterador está posicionado sobre una categoría.
 template<class T>
 bool Taxonomia<T>::iterator::esRaiz() const {
-    return false;
+    return _padres.size() == 0;
 }
 
 // Ubica el iterador sobre la supercategoría de la categoría
@@ -130,6 +144,8 @@ bool Taxonomia<T>::iterator::esRaiz() const {
 // y además !esRaiz()
 template<class T>
 void Taxonomia<T>::iterator::supercategoria() {
+    _actual = _padres[_padres.size() - 1];
+    _padres.pop_back();
 }
 
 // Compara dos iteradores por igualdad.
@@ -147,6 +163,7 @@ bool Taxonomia<T>::iterator::operator==(
 // de la taxonomía.
 template<class T>
 void Taxonomia<T>::iterator::operator++() {
+
 }
 
 // Ubica el iterador sobre la categoría anterior a la actual
