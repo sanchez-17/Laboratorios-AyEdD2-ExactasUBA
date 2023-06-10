@@ -47,3 +47,5 @@
           ¿ f(n) ∈ O( n^(1-e) ) ? false  
         * cumple 2 condicion 
         => T(b) = θ(log(b))
+
+5) 
