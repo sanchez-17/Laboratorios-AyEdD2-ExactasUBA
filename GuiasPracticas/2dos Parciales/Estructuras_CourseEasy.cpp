@@ -1,3 +1,4 @@
+Parcial 11/12/2021
 Id del curso            : Nat,se puede usar una funcion llamada NuevoID()
 Nombre                  : String(con maxima longitud acotada)
 Area tematica principal : String (acotada) de un listado predefinido de areas
