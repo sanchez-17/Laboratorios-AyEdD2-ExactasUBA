@@ -446,3 +446,34 @@ if vacia?(cs)
 			else aux1(p,sinUno(cs),cantMax,t,res)
 		 fi
 fi
+
+##################################################################################################
+# 										        1P2C2021 							   28/09/2019#
+#										Centro De Adopcion De Gatitos							 #
+##################################################################################################
+TAD Gatito ES String //representa la raza
+TAD Persona ES Nat
+TAD Centro De Adopciones
+genero centro
+-Igualdad Observacional
+(∀c1,c2:centro)(c1 = c2 ⇔ gatitosEnAdopcion(c1)=gatitosEnAdopcion(c2) ∧ listaDeEspera(c1)=listaDeEspera(c2) 
+						  ∧ personasConGato(c1)=personasConGato(c2) ∧ 
+						  (∀p:Persona)(p∊personasConGato(c1)=>L queGatoTiene(c1,p)=queGatoTiene(c2,p) ∧ 
+						  #Adopciones(c1,p)=#Adopciones(c2,p))
+				)
+
+-Observadores Basicos
+gatitosEnAdopcion  : centro → multiconj(Gatito)
+personasConGato    : centro → conj(Persona)
+listaDeEspera      : centro → secu(Persona)
+queGatoTiene       : centro:c x Persona:p → Gatito   {p∊personasConGato(c)}
+#Adopciones        : centro:c x Persona:p → Nat      {p∊personasConGato(c)}
+
+-Generadores
+CrearCentro        : → centro
+darEnAdopcion      : centro x multiconj(Gatito) → centro
+pedirGato          : centro:c x Persona:p → centro        {¬(p∊personasConGato(c))}
+devolverGatito_U.U : centro:c x Persona:p → centro        {p∊personasConGato(c)}
+
+-Otras Operaciones
+personaQueMasAdopto: centro:c x Persona:p -> Persona
