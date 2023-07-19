@@ -1,0 +1,110 @@
+TAD Baldosa, Turno, Dado son Nat
+TAD Acción es Entero
+TAD Jugador es { J1 | J2 } (¹)
+
+TAD Tablero
+    Géneros: tablero
+    Exporta: Tablero 
+    Usa: Baldosa, Acción, ArregloDimensionable(ɑ)
+
+    Igualdad Observacional:
+        (∀ t₀,t₁: Tablero, ∀b, b': Baldosa
+            t₀ =obs t₁ ⇔
+                TotalBaldosas(t₀) = TotalBaldosas(t₁) ∧
+                 (b ≤ TotalBaldosas(t₀) ∧ b' = b) ⇒
+                    AcciónEnBaldosa(t₀, b) = AcciónEnBaldosa(t₁, b')
+                )
+        )
+
+    Observadores:
+        TotalBaldosas: Tablero → Nat
+        AcciónEnBaldosa: Tablero t × Baldosa b → Acción                 { b ≤ TotalBaldosas(t) }
+
+    Generadores:
+        NuevoTablero: ArregloDimensionable(Acción) s → Tablero          { tam(s) > 2 }
+
+    Axiomas:
+        TotalBaldosas(NuevoTablero(s)) = tam(s)
+        AcciónEnBaldosa(NuevoTablero(s), b) = s[b]
+
+TAD JDO
+    Géneros: juegoDeLaOca
+    Exporta: JDO 
+    Usa: Tablero, Baldosa, Turno, Dado Acción, ArregloDimensionable(ɑ)
+
+    Igualdad Observacional:
+        (∀ o₀,o₁: JDO, ∀b, b': Baldosa, ∀j, j': Jugador, ∀t, t': Turno, 
+            o₀ =obs o₁ ⇔
+                Tablero(o₀) =obs Tablero(o₁) ∧
+                TurnoActual(o₀) =obs TurnoActual(o₁) ∧
+                JugadorActual(o₀) =obs JugadorActual(o₁) ∧
+                (j = j' ⇒
+                    PosicionActual(o₀, j) =obs PosicionActual(o₁, j') ∧
+                    (t = t' ⇒ DadoEnTurno(o₀, t, j) =obs DadoEnTurno(o₁, t', j')) ∧
+                    (b = b' ⇒ PasoPor(o₀, b, j) =obs PasoPor(o₁, b', j'))
+                )
+        )
+    
+    Observadores:
+        Tablero: JDO → Tablero
+        TurnoActual: JDO → Turno
+        JugadorActual: JDO → Jugador
+        PosicionActual: JDO × Jugador → Baldosa
+        DadoEnTurno: JDO o × Turno t × Jugador → Dado                   { t ≤ TurnoActual(o) }
+        PasoPor: JDO o × Baldosa b × Jugador → bool                     { b ≤ TotalBaldosas(Tablero(o)) }
+
+    Generadores:
+        NuevaOca: Tablero → JDO
+        Jugar: JDO o × Dado d → JDO                                     { 1 ≤ d ≤ 6 ∧ HayGanador?(o) = false }
+
+    Otras Operaciones:
+        HayGanador?: JDO → bool
+        Ganador: JDO → Jugador                                          { HayGanador?(o) = true }
+        
+    Axiomas:
+        Tablero(NuevaOca(t)) ≡ t
+        Tablero(Jugar(o, d)) ≡ Tablero(o)
+
+        TurnoActual(NuevaOca(t)) ≡ 0
+        TurnoActual(Jugar(o, d)) ≡
+            if JugadorActual(o) = J1
+                then 1 + TurnoActual(o)
+                else TurnoActual(o)
+
+        JugadorActual(NuevaOca(t)) ≡ J1
+        JugadorActual(Jugar(o, d)) ≡
+            if (JugadorActual(o) = J1
+                then J2
+                else J1
+
+        PosicionActual(NuevaOca(t), j) ≡ 0
+        PosicionActual(Jugar(o, d), j) ≡
+            if JugadorActual(o) = j
+                then if PosicionActual(o, j) + d ≥ TotalBaldosas(Tablero(o))
+                    then TotalBaldosas(Tablero(o))
+                    else if PosicionActual(o, j) + d + AcciónEnBaldosa(Tablero(o), PosicionActual(o, j) + d) ≥ TotalBaldosas(Tablero(o))
+                        then TotalBaldosas(Tablero(o))
+                        else PosicionActual(o, j) + d + AcciónEnBaldosa(Tablero(o), PosicionActual(o, j) + d)
+                else
+                    PosicionActual(o, j)            
+                
+        (¹)
+        DadoEnTurno(Jugar(o, d), t, j) =
+            if t = TurnoActual(o) ∧ j = JugadorActual(o)
+                then d
+                else DadoEnTurno(o, t, j)
+
+        PasoPor(NuevaOca(t), b, j) ≡ false
+        PasoPor(Jugar(o, d), b, j) ≡
+            if JugadorActual(o, d) = j
+                then if PosicionActual(o, j) + d ≥ TotalBaldosas(Tablero(o))
+                    then TotalBaldosas(Tablero(o)) = b ∨ PasoPor(o, b, j)
+                    else if PosicionActual(o, j) + d + AcciónEnBaldosa(Tablero(o), PosicionActual(o, j) + d) ≥ TotalBaldosas(Tablero(o))
+                        then d = b ∨ TotalBaldosas(Tablero(o)) = b ∨ PasoPor(o, b, j)
+                        else PosicionActual(o, j) + d = b ∨
+                              PosicionActual(o, j) + d + AcciónEnBaldosa(Tablero(o), PosicionActual(o, j) + d) = b ∨
+                             PasoPor(o, b, j)
+                else PasoPor(o, b, j)
+
+    Nota:
+        (¹): Por la restricción que tiene este observador, no corresponde axiomatizarlo para el generador NuevaOca

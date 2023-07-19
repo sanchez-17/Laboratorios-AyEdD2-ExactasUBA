@@ -1,0 +1,38 @@
+// Nota: Esta no es una resolución completa ni siquiera está escrito todo el pseudocódigo.  La idea de esta clase era más bien ver cómo pensar los ejercicios y cómo crear una estructura a partir de las restricciones que pide el enunciado.
+// Además, acá sólo está la primer parte del ejercicio, aparentemente no escribimos demasiado de la parte de Ubicación Más Fotografiada
+
+Fecha es tupla (dia, mes, año)
+
+Fotonica se representa con estr
+ estr es tupla (
+        Fotos: DiccLog(foto, tupla(
+                    Tags: secuencia(tag),
+                    Fecha: fecha,
+                    Lugar: ubicacion,
+                    itTags: vector(iteradorLista)   // apuntan a la posición de la foto en las secuencias que corresponden a sus tags en FotosPorTag
+                    itDia: iteradorLista            // apunta a la posición de la foto en las secuencias que corresponden a sus tags en FotosPorDia
+                ),
+            ),
+        FotosPorTag: DiccTrie(tag, secuencia(foto)),
+        FotosPorDía: Vector(Vector(secuencia(foto)))  // matriz con días en las columnas y meses en las filas (también se podría hacer un vector de 366 posiciones)  
+)
+
+AgregarFoto(in/out Fotonica e, in nat: foto, in secuencia(tag): tags, in  
+    * Para cada uno de los tags de la foto                                                    // t veces -- O(t)
+        * Agregar la foto a la secuencia del tag en FotosPorTag                               // O(1)
+        * Guardarse un iterador al nodo recién agregado en una secuencia local a este método  // O(1)
+    * Agregar la foto a la secuencia del día en FotosPorDía                                   // O(1)
+    * Guardar un iterador al nodo recién agregado en una variable local                       // O(1)
+    * Definir en Fotos la tupla incluyendo tags, fecha, ubicacion y los iteradores            // O(log(n))
+
+
+BorrarFoto
+    * Buscar la tupla que corresponde a la foto        // O(log(n))
+    * Para cada iterador de itTags                     // O(t)
+        * Borrar el nodo que corresponde al iterador   // O(1)
+    * Borrar el nodo que corresponde a itDia           // O(1)
+    * Borrar del diccionario                           // O(log(n))
+
+
+
+

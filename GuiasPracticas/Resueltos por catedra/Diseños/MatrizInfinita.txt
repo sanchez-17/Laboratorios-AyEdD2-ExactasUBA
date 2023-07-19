@@ -1,0 +1,54 @@
+// Nota: Esta no es una resolución completa ni una resolución formal.  En particular van a ver que los nombres que uso para los módulos no necesariamente coinciden con los que están en el apunte de módulos básicos.  La idea de esta clase era más bien ver cómo pensar los ejercicios y cómo crear una estructura a partir de las restricciones que pide el enunciado
+
+MatrizInfinitaDeBooleanos
+    es tupla (
+        Matriz: Vector(Vector(bool))
+        bool: devolverComplementada
+    )
+
+iCrear(out res: Matriz)
+    estr.Matriz := [] // Nuevo vector vacío
+
+
+iVer(in MatrizInfinitaDeBooleanos m, in Nat i, in Nat j, out res: bool)
+    if ( // La posición que se pide no está definida
+        len(estr.Matriz) == 0 ||     //Matriz vacía, lo trato aparte para que no se indefina Matriz[0])
+        len(estr.Matriz) < i || len(estr.Matriz[0]) < j
+    )
+        if (estr.devolverComplementada)
+            res = True
+        else
+            res = False
+    else    
+        if (estr.devolverComplementada)
+            res = ¬ estr.Matriz[i][j]
+        else
+            res = estr.Matriz[i][j]
+
+
+// Hay varias estrategias para amortizar la creación de los vectores nuevos cuando se quiere asignar algo que está fuera de rango, ya sea agregando atrás
+//  como se escriba el apunte, o aumentando el tamaño de los vectores por bloques fijos, por ejemplo, crear hasta el múltiplo de 20 más cercano cuando se quiere definir
+//  un valor mayor a lo ya definido
+iAsignar(in/out MatrizInfinitaDeBooleanos m, in Nat i, in Nat j, in b: bool)
+    if (len(estr.Matriz) == 0) //Matriz vacía, lo trato aparte para que no se indefina Matriz[0])
+        // crear i vectores con contenido de tamaño j
+
+    if (len(estr.Matriz) $\lt$ i)
+        if (len(estr.Matriz[0]) $\lt$ j)
+            // agregar las filas que falten con vectores de tamaño j
+            // redimensionar las filas que existen
+        else
+            // agregar filas que falten con vectores tamaño len(estr.Matriz[0])
+            // redimensionar las filas que existen
+    else    
+        if (len(estr.Matriz[0]) $\lt$ j)
+            // redimensionar las filas que existen
+
+    if (estr.devolverComplementada)
+        estr.Matriz[i][j] = ¬ b
+    else
+        estr.Matriz[i][j] = b
+
+iComplementar(in/out: Matriz)
+    estr.devolverComplementada = ¬ estr.devolverComplementada
+

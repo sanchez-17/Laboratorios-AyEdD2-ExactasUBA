@@ -1,0 +1,85 @@
+TAD persona ES int
+
+TAD Carpinteros
+
+Genero carp
+
+Observadores
+
+maestros: carp -> Conj(persona)
+aprendices: carp -> Conj(persona)
+desertores: cartp -> Conj(persona)
+nivel: carp c x persona p -> int       {p in aprendices(c)}
+tutor: carp c x persona p -> persona   {p in aprendices(c)}
+
+Generadores
+
+iniciarCentro: conj(persona) cm -> carp      {not empty(cm)}
+ingresar: carp c x persona p -> carp         {not (p in (aprendices(c) U maestros(c) U desertores(c)))}
+avanzarDeNivel: carp c x persona p -> carp   {p in aprendices(c)}
+desertar: carp c x persona p -> carp         {p in (aprendices(c) U maestros(c)) AND noEsElUnicoMaestro(c, p)}
+
+Otras Operaciones
+
+carpinterosConNivelMayorA: carp x int n -> Conj(persona)     {n < 10}
+carpinterosConNivelMayorAEn: carp c x int n x Conj(persona) ps -> Conj(persona)
+															 {n < 10 AND ps subset aprendices(c)}
+noEsElUnicoMaestro: carp x persona -> bool 
+descendientes: carp c x persona p -> persona                 {p in (aprendices(c) U maestros(c))}
+descendientesAcadémicos: carp c x persona p -> Conj(persona) {p in (aprendices(c) U maestros(c))}
+descendientesAcadémicosDeDescendientes: carp c x Conj(persona) ps -> Conj(persona)
+															 {ps subset (aprendices(c) U maestros(c))}
+
+Axiomas
+
+maestros(iniciarCentro(cm))   = cm
+maestros(ingresar(c,p))       = maestros(c)
+maestros(avanzarDeNivel(c,p)) = if nivel(c,p) < 9 then maestros(c) else Ag(p,maestros(c)) fi
+maestros(desertar(c,p))       = maestros(c) - {p}
+
+aprendices(iniciarCentro(cm))   = empty
+aprendices(ingresar(c,p))       = Ag(p, aprendices(c))
+aprendices(avanzarDeNivel(c,p)) = if nivel(c,p) < 9 then aprendices(c) else aprendices(c) - {p} fi
+aprendices(desertar(c,p))       = aprendices(c) - {p}
+
+desertores(iniciarCentro(cm))   = empty
+desertores(ingresar(c,p))       = desertores(c)
+desertores(avanzarDeNivel(c,p)) = desertores(c)
+desertores(desertar(c,p))       = Ag(p, desertores(c))
+
+nivel(ingresar(c,p), p')       = if p = p' then 1 else nivel(c,p') fi
+nivel(avanzarDeNivel(c,p), p') = if p = p' then nivel(c,p') + 1 else nivel(c,p') fi
+nivel(desertar(c,p), p')       = nivel(c,p')
+
+tutor(ingresar(c,p), p')       = dameUno(carpinterosConNivelMayorA(c,1))
+tutor(avanzarDeNivel(c,p), p') = if p = p' then dameUno(carpConNivelMayorA(c,nivel(c,p')+1)) else tutor(c,p')
+tutor(desertar(c,p), p')       = if p = tutor(c,p') then dameUno(carpinterosConNivelMayorA(c,1) - {p}) else tutor(c,p') fi
+
+carpinterosConNivelMayorA(c,n) = carpinterosConNivelMayorAEn(c,n,aprendices(c)) U maestros(c)
+
+carpinterosConNivelMayorAEn(c,n,ps) = if empty?(ps) 
+		then empty
+		else if nivel(dameUno(ps)) > n 
+			then Ag(dameUno(ps), carpinterosConNivelMayorAEn(c,n,sinUno(ps)))
+			else carpinterosConNivelMayorAEn(c,n,sinUno(ps))
+		fi
+	fi
+
+noEsElUnicoMaestro(c,p) = not (long(maestros(c)) == 1 AND_L p in maestros(C))
+
+descendientes(c,p) = descendientesEn(c,p,aprendices(c))
+
+descendientesEn(c,p,ps) = if empty?(ps)
+		then empty
+		else if tutor(dameUno(ps)) = p 
+			then Ag(dameUno(ps), descendientesEn(c,p,sinUno(ps)))
+			else descendientesEn(c,p,sinUno(ps))
+		fi
+	fi
+
+descendientesAcadémicos(c,p) = descendientes(c,p) U descendientesAcadémicosDeDescendientes(c,descendientes(c,p))
+
+descendientesAcadémicosDeDescendientes(c, ps) = if empty?(ps) 
+		then empty 
+		else descendientesAcadémicos(c, dameUno(ps)) U descendientesAcadémicosDeDescendientes(c, sinUno(ps))
+	fi

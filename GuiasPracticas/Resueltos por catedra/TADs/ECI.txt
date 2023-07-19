@@ -1,0 +1,149 @@
+TAD Turno es { Mañana | Tarde | Noche }
+TAD Curso es Tupla(string, string) // Nombre, turno
+TAD Aula es Nat // Capacidad
+TAD Persona es string
+TAD CausaDeBaja es { Cupos | Voluntaria | Ausencias }
+
+Observadores:
+
+Cursos: ECIA → Conj(Curso)
+CapacidadAula: ECIA e × Curso c → Nat 
+	{ c ∊ cursos(e) }
+InscriptosIniciales: ECIA e × Curso c → Conj(Persona)
+	{ c ∊ Cursos(e) }
+InscriptosActivos: ECIA e × Curso c → Conj(Persona)
+	{ c ∊ Cursos(e) }
+CausaDeBaja: ECIA e × Curso c × Persona p → CausaDeBaja 
+	{c ∊ Cursos(e) ∧L p ∊ PersonasDadasDeBaja(e, c) }
+Asistencias: ECIA e × Curso c × Persona p → Nat 
+	{c ∊ Cursos(e) ∧L p ∊ InscriptosActivos(e, c) }
+Faltas: ECIA e × Curso c × Persona P → Nat 
+	{c ∊ Cursos(e) ∧L p ∊ InscriptosActivos(e, c) }
+
+
+Generadores:
+
+CrearECI: Conj(Curso): c × Dicc(Curso, Aula): asignaciones × Dicc(Curso, Conj(Persona)) inscriptos
+		{ c = claves(asignaciones) = claves(inscriptos) }
+DarDeBaja: ECIA × Curso c × Persona p
+	{c ∊ Cursos(e) ∧L p ∊ InscriptosActivos(e, c) }
+PasarLista: ECIA e × Curso c × Conj(Persona) presentes × Conj(Persona) ausentes → ECIA
+		{ c ∊ Cursos(e) ∧L Vacio?(presentes ∩ ausentes) ∧ ∀p P: persona: p ∊ presentes ∪ ausentes => p ∊ InscriptosActivos(e, c) }
+JustificarAusencias: ECIA × Curso c × Persona p
+	{ c ∊ Cursos(e) ∧L p ∊ PersonasDadasDeBaja(e, c) ∧L CausaDeBaja(e, c, p = Ausencias) }
+
+
+Otras Operaciones:
+
+ObtenerNReasignados: ECIA e → Conj(Persona) // A definir a futuro
+DeBajaPorAusencias: ECIA e × Curso c → Conj(Persona) 
+	{ c ∊ Cursos(e) }
+DeBajaPorCupos: ECIA e × Curso c → Conj(Persona) 
+	{ c ∊ Cursos(e) }
+DeBajaVoluntaria: ECIA e × Curso c → Conj(Persona) 
+	{ c ∊ Cursos(e) }
+PersonasDadasDeBaja: ECIA e × Curso c → Conj(Persona)
+	{ c ∊ Cursos(e) }
+LlegaronADosFaltas: ECIA e × Curso c × Conj(Persona) ausentes → Conj(Persona) 
+	{ c ∊ Cursos(e) ∧L ∀p P: persona: p ∊ ausentes => p ∊ InscriptosActivos(e, c) }
+FiltrarBajasPor: ECIA e × Curso c × Conj(Persona) deBaja × CausaDeBaja → Conj(Persona)
+	{ c ∊ Cursos(e) ∧L ∀p P: persona: p ∊ deBaja => p ∊ PersonasDadasDeBaja(e, c) }
+
+
+Axiomas:
+
+Cursos(CrearECI(cs, a, i)) ≡ cs
+Cursos(DarDeBaja(e, c, p)) ≡ Cursos(e) 
+Cursos(PasarLista(e, c, p, a)) ≡ Cursos(e) 
+Cursos(JustificarAusencias(e, c, p)) ≡ Cursos(e)
+
+InscriptosIniciales(CrearECI(cs, a, i), c) ≡ obtener(c, i)
+InscriptosIniciales(DarDeBaja(e, c, p), c) ≡ InscriptosIniciales(e) 
+InscriptosIniciales(PasarLista(e, c, p, a), c) ≡ InscriptosIniciales(e) 
+InscriptosIniciales(JustificarAusencias(e, c, p), c) ≡ InscriptosIniciales(e)
+
+InscriptosActivos(CrearECI(cs, a, i), c) ≡ 
+if (obtener(c, a) = #(obtener(c, i)
+	then obtener(c, i)
+	else if (obtener(c, a) < #(obtener(c, i)
+		then dameN(obtener(c, i), #obtener(c, i) - obtener(c, a))
+		else obtener(c, i) ∪ ObtenerNReasignados(e, obtener(c, a) - #obtener(c, i))
+		fi
+	fi
+fi
+InscriptosActivos(DarDeBaja(e, c_g, p), c_o) ≡ 
+if (c_g = c_o) 
+	then InscriptosActivos(e) - { p }
+	else InscriptosActivos(e)
+fi
+InscriptosActivos(PasarLista(e, c_g, p, a), c_o) ≡ 
+if (c_g = c_o) 
+	then InscriptosActivos(e) - LlegaronADosFaltas(e, c_g, a)
+	else InscriptosActivos(e)
+fi
+InscriptosActivos(JustificarAusencias(e, c, p)) ≡
+if (c_g = c_o) 
+	then Ag(p, InscriptosActivos(e))
+	else InscriptosActivos(e)
+fi
+
+CausaDeBaja(CrearECI(cs, a, i), c, p) ≡ Cupos  // Si está de baja y la recursión llega hasta acá no puede ser otra razón
+CausaDeBaja(DarDeBaja(e, c_g, p_g), c_o, p_o) ≡ 
+if (c_g = c_o ∧ p_g = p_o) 
+	then Voluntaria
+	else CausaDeBaja(e)
+fi
+CausaDeBaja(PasarLista(e, c_g, ps, a), c_o, p) ≡ 
+if (c_g = c_o ∧ p ∊ LlegaronADosFaltas(e, c_g, a)) 
+	then Ausencias
+	else CausaDeBaja(e)
+fi
+CausaDeBaja(JustificarAusencias(e, c, p)) ≡ CausaDeBaja(e)
+
+Asistencias(CrearECI(cs, a, i), c, p) ≡ 0  // Por las restricciones puedo asumir que la persona está inscripta en algún curso
+Asistencias(DarDeBaja(e, c_g, p_g), c_o, p_o) ≡ Asistencias(e, c_o, p_o)
+Asistencias(PasarLista(e, c_g, ps, a), c_o, p_i) ≡ 
+if (c_g = c_o ∧ p ∊ ps) 
+	then Asistencias(e, p_o, c_o) + 1
+	else Asistencias(e, p_o, c_o)
+fi
+Asistencias(JustificarAusencias(e, c_g, p_g), c_o, p_o) ≡ Asistencias(e, p_o, c_o)
+
+Faltas(CrearECI(cs, a, i), c, p) ≡ 0  // Por las restricciones puedo asumir que la persona está inscripta en algún curso
+Faltas(DarDeBaja(e, c_g, p_g), c_o, p_o) ≡ Faltas(e, c_o, p_o)
+Faltas(PasarLista(e, c_g, ps, a), c_o, p_i) ≡ 
+if (c_g = c_o ∧ p ∊ a) 
+	then Faltas(e, p_o, c_o) + 1
+	else Faltas(e, p_o, c_o)
+fi
+Faltas(JustificarAusencias(e, c_g, p_g), c_o, p_o) ≡
+if (c_g = c_o ∧ p_g = p_o)
+	then 0
+	else (Faltas(e, c_o, p_o))
+fi
+
+
+PersonasDadasDeBaja(e, c) ≡ InscriptosIniciales(e, c) - InscriptosActivos(e, c)
+DeBajaPorAusencias(e, c) ≡ FiltrarBajasPor(PersonasDadasDeBaja(e, c), Ausencias)
+DeBajaPorCupos(e, c) ≡ FiltrarBajasPor(PersonasDadasDeBaja(e, c), Cupos)
+DeBajaVoluntaria(e, c) ≡ FiltrarBajasPor(e, c, PersonasDadasDeBaja(e, c), Voluntaria)
+
+LlegaronADosFaltas(e, c, ausentes) ≡ 
+if Vacia?(ausentes)
+	then Vacia
+	else if (Faltas(e, c, dameUno(ausentes)) = 1
+		then Ag(dameUno(ausentes), LlegaronADosFaltas(e, c, sinUno(ausentes))
+		else LlegaronADosFaltas(e, c, sinUno(ausentes))
+	fi
+fi
+
+FiltrarBajasPor(e, c, deBaja, causa) ≡ 
+if Vacia?(deBaja)
+	then Vacia
+	else if (CausaDeBaja(e, c, dameUno(deBaja)) = caussa
+		then Ag(dameUno(deBaja), FiltrarBajasPor(e, c, sinUno(deBaja), causa)
+		else LlegaronADosFaltas(e, c, sinUno(deBaja), causa)
+	fi
+fi
+
+ObtenerNReasignados(e) // A definir a futuro

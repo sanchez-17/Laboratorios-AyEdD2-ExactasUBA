@@ -1,0 +1,154 @@
+∈ ∧ ∃ ∀ ≡ ∅ ¬ → π₁₂ ⇔ ≠ ≤ ← ×
+
+Falta: 	.Implementar de forma completa el observador TieneEspíaPlantado en todos los lugares donde haya una pelea
+	   	.Finalizar la implementación de Losers y sus auxiliares
+	   	.Finalizar la implementación de Poderío, teniendo en cuenta cuando dos reinos tienen aliados en común
+
+Preguntas: .Hay que poner como restricción en todos los observadores y generadores que {R ∈ Reinos(G)}? Si
+
+TAD GUESTEROS
+	Igualdad observacional
+
+
+	Observadores
+
+		Reinos: Continente G → conj(reinos)
+		Soldados: Reino R × Continente G → nat N
+		Aliados: Reino R × Continente G → conj(reinos) 
+		HistorialBajas: Continente G → secu(nat)
+		TieneEspíaPlantado: Reino R₁ × Reino R₂ × Continente G → bool
+		Losers: Continente G → conj(reinos)
+
+	Generadores
+
+		CrearContinente: conj(reinos) C → Continente G
+		Pelear: Reino R₁ × Reino R₂ × Continente G → Continente G              {¬ R₁ ∈ Aliados(R₂, G) ∧ R₁ ≠ R₂}
+		Aliar: Reino R₁ × Reino R₂ × Continente G → Continente G  					     {¬ R₁ ∈ Aliados(R₂, G)}
+		PlantarEspía: Reino R₁ × Reino R₂ × Continente G → Continente G
+	
+	Otras operaciones 
+
+		Poderío: Reino R × conj(reinos) cr × Continente G → nat N            {cr = aliados(r)}
+		esLoser: Reino R × conj(reinos) cr → bool
+		LosersAux: secu(reinos) sr × nat N → conj(reinos)
+		secuenciar: conj(reinos) cr → secu(reinos)
+		conjuntar: secu(reinos) sr → conj(reinos)
+
+	Axiomas
+
+		Reinos(CrearContinente(C)) ≡ C
+			Reinos(Pelear(R₁, R₂, G)) ≡ Reinos(G)
+			Reinos(Aliar(R₁, R₂, G)) ≡ Reinos(G)
+			Reinos(PlantarEspia(R₁, R₂, G)) ≡ Reinos(G)
+
+		Soldados(R, CrearContinente(C)) ≡ Soldados(R)
+			Soldados(R, Pelear(R₁, R₂, G)) ≡ 
+				If R = R₁ then 
+					If(Poderío(R, aliados(R), G)> Poderío(R₂, aliados(R), G)) then
+						Soldados(R)
+					else
+						porc(Soldados(R), 30)
+					fi
+				else 
+					If R = R₂ then
+						If TieneEspíaPlantado(R, R₁, G) then
+							If(2 * Poderío(R, aliados(R), G)>= Poderío(R₁, aliados(R), G)) then
+								Soldados(R)
+							else
+								porc(Soldados(R), 30)
+							fi
+						else 
+							If(Poderío(R, aliados(R), G)>= Poderío(R₁, aliados(R), G)) then
+								Soldados(R)
+							else
+								porc(Soldados(R), 30)
+							fi						
+						fi
+					else 
+						Soldados(R)
+					fi
+				fi
+			Soldados(R, Aliar(R₁, R₂, G)) ≡ Soldados(R) 
+			Soldados(R, PlantarEspia(R₁, R₂, G)) ≡ Soldados(R)
+
+ 		Aliados(R, CrearContinente(C)) ≡ ∅
+ 			Aliados(R, Pelear(R₁, R₂, G)) ≡ 
+ 				If R = R₁ then 
+					If(Poderío(R, aliados(R), G) > Poderío(R₂, aliados(R), G) ∧  porc(Soldados(R),10)) >= porc(70, Soldados(R₂)) then
+						Ag(R₂, Aliados(R))
+					else
+						If (Poderío(R, aliados(R), G) <= Poderío(R₂, aliados(R), G) ∧ porc(70, Soldados(R)) <= porc(Soldados(R₂),10)) then
+							{R₂}
+						else
+							Aliados(R)
+						fi
+					fi
+				else 
+					If R = R₂ then
+						If(Poderío(R, aliados(R), G) >= Poderío(R₁, aliados(R), G) ∧ porc(Soldados(R),10)) >= porc(70, Soldados(R₁)) then
+							Ag(R₁, Aliados(R))
+						else
+							If (Poderío(R, aliados(R), G)< Poderío(R₁, aliados(R), G) ∧ porc(70, Soldados(R)) <= porc(Soldados(R₁),10)) then
+								{R₁}	
+							else 
+								Aliados(R)
+							fi
+						fi
+					else 
+						Aliados(R)
+					fi
+				fi
+			Aliados(R, Aliar(R₁, R₂, G)) ≡ 
+				If R = R₁ then 
+					Ag(R₂, Aliados(R))
+				else
+					If R = R₂ then
+						Ag(R₁, Aliados(R))
+					else
+						Aliados(R)
+					fi
+				fi
+			Aliados(R, PlantarEspia(R₁, R₂, G)) ≡ Aliados(R) 
+
+		HistorialBajas(CrearContinente(C)) ≡ [] 
+			HistorialBajas(Pelear(R₁, R₂, G)) ≡ HistorialBajas(G) ° 
+				If Poderío(R₁, aliados(R), G) > Poderío(R₂, aliados(R), G) then
+					porc(30, Soldados(R₂)) 
+				else
+					porc(30, Soldados(R₁))
+				fi  
+			HistorialBajas(Aliar(R₁, R₂, G)) ≡ HistorialBajas(G)
+			HistorialBajas(PlantarEspia(R₁, R₂, G)) ≡ HistorialBajas(G)
+
+		TieneEspíaPlantado(R, R*, CrearContinente(C)) ≡ false 
+			TieneEspíaPlantado(R, R*, Pelear(R₁, R₂, G)) ≡ TieneEspíaPlantado(R₁, R₂, G)
+			TieneEspíaPlantado(R, R*, Aliar(R₁, R₂, G)) ≡ TieneEspíaPlantado(R₁, R₂, G)
+			TieneEspíaPlantado(R, R*, PlantarEspia(R₁, R₂, G)) ≡ 
+				If	R = R₁ ∧ R* = R₂ then
+					true
+				else
+					TieneEspíaPlantado(R, R*, G)
+				fi
+
+		Losers(CrearContinente(C)) ≡ LosersAux(secuenciar(C), 0)
+
+			Losers(Pelear(R₁, R₂, G)) ≡
+			Losers(Aliar(R₁, R₂, G)) ≡
+			Losers(PlantarEspia(R₁, R₂, G)) ≡ 
+
+
+		LosersAux(S, n) ≡ 
+			if n = long(S) then
+				∅
+			else
+				if esLoser(S[n], conjuntar(S))
+					ag(S[n], LosersAux(S, n + 1))
+				else
+					LosersAux(S, n + 1)
+				fi
+			fi
+
+
+		Poderío(R, C, G) ≡ 
+
+

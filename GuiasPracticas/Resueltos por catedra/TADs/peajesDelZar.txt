@@ -1,0 +1,111 @@
+TAD TipoVehículo es String
+TAD Cabina es Nat
+TAD Límite es Nat
+TAD Precio es Nat
+
+TAD PDZ
+
+    Géneros: peaje
+    Exporta: Peaje, observadores, generadores, 
+    Usa: Precio, Limite, Vehiculo, Cabina, Bool, Nat, Cola(ɑ)
+
+    Igualdad Observacional:
+        (∀ p₀,p₁: PDZ, ∀c,c': Cabina, ∀ t: TipoVehículo
+            (p₀ =obs p₁ ⇔
+                Limite(p₀) = Limite(p₁) ∧
+                Precios(p₀) = Precios(p₁) ∧
+                Cabinas(p₀) = Cabinas(p₁) ∧
+                 (c ≤ Cabinas(p₀) ∧ c' = c) ⇒
+                    ColaEnCabina(p₀, c) = ColaEnCabina(p₁, c) 
+                    Facturacion(p₀, c) = Facturacion(p₁, c) 
+                    t ∊ claves(Precios(p)) ⇒ VehiculosTotalesPorCabina(p0, c, t) ≡ VehiculosTotalesPorCabina(p₁, c', t)
+            )
+        )
+    
+    Observadores Básicos:
+        #Cabinas: PDZ → Nat
+        Límite: PDZ → Límite
+        Precios: PDZ → Dicc(TipoVehículo, Precio)
+        ColaEnCabina: PDZ p × Cabina c → Cola(TipoVehículo)                        { c ≤ #Cabinas(p) }
+        Facturación: PDZ p × Cabina c → Nat                                        { c ≤ #Cabinas(p) }
+        VehiculosTotalesPorCabina: PDZ p × Cabina c × TipoVehiculo t → Nat         { c ≤ #Cabinas(p) ∧ t ∊ claves(Precios(p)) } (¹)
+
+    Generadores:
+        AbrirPDZ: Cabina × Límite × Dicc(TipoVehículo, Precio) → Precio
+        LlegarVehiculo: PDZ p × TipoVehiculo t × Cabina c → PDZ                    { c ≤ #Cabinas(p) ∧ t ∊ claves(Precios(p)) }
+        CobrarVehículo: PDZ p × Cabina c → PDZ                                     { c ≤ #Cabinas(p) }
+
+    Otras Operaciones:
+        DesencolarN: Cola(TipoVehículo) c × Nat n → Cola(TipoVehículo)             { n ≤ tamaño(c) } (²)
+        VehiculosDeTipoQuePasan: Cola(TipoVehículo) c × Nat n × TipoVehículo       { n ≤ tamaño(c) } (²)
+
+    Axiomas:
+        #Cabinas(AbrirPDZ(c, l, p)) ≡  c
+        #Cabinas(LlegarVehiculo(p, t, c)) ≡ Cabinas(p)
+        #Cabinas(CobrarVehículo(p, c)) ≡ Cabinas(p)
+
+        Límite(AbrirPDZ(c, l, p)) ≡ l
+        Límite(LlegarVehiculo(p, t, c)) ≡ Cabinas(p)
+        Límite(CobrarVehículo(p, c)) ≡ Cabinas(p)
+
+        Precios(AbrirPDZ(c, l, p)) ≡ p
+        Precios(LlegarVehiculo(p, t, c)) ≡ Cabinas(p)
+        Precios(CobrarVehículo(p, c)) ≡ Cabinas(p)
+
+        ColaEnCabina(AbrirPDZ(c_g, l, p), c_o) ≡ vacía
+        ColaEnCabina(LlegarVehículo(p, t_g, c_g), c_o) ≡ 
+            if c_g = c_o
+                then if tamaño(ColaEnCabina(p, c_g)) = Límite(p)
+                    then Encolar(t_g, DesencolarN(ColaEnCabina(p, c_o), tamaño(ColaEnCabina(p, c_g)/2)))
+                    else Encolar(t_g, ColaEnCabina(p, c_o), tamaño(ColaEnCabina(p, c_o)/2))
+                else if tamaño(ColaEnCabina(p, c_g)) = Límite(p)
+                    then desencolarN(ColaEnCabina(p, c_o), tamaño(ColaEnCabina(p, c_o)/2))
+                    else ColaEnCabina(p, c_o)
+        ColaEnCabina(CobrarVehículo(p, c_g), c_o) ≡
+            if c_g = c_o
+                then desencolar(ColaEnCabina(p, c_o))
+                else ColaEnCabina(p, c_o)
+
+        Facturación(AbrirPDZ(c_g, l, p), c_o) ≡ 0
+        Facturación(LlegarVehículo(p, t_g, c_g), c_o) ≡ Facturación(p, c_o)
+        Facturación(CobrarVehículo(p, c_g), c_o) ≡
+            if c_g = c_o
+                then Facturación(p, c_o) + obtener(próximo(ColaEnCabina(p, c_o), Precios(p))
+                else Facturación(p, c_o)
+
+        VehículosTotalesPorCabina(AbrirPDZ(c_g, l, p), t, c_o) ≡ 0
+        VehículosTotalesPorCabina(LlegarVehículo(p, t_g, c_g), t_o, c_o) ≡
+            if tamaño(ColaEnCabina(p, c_g)) = Límite(p)
+                then VehículosTotalesPorCabina(p, t_o, c_o) + VehiculosDeTipoQuePasan(ColaEnCabina(p, c_o), tamaño(ColaEnCabina(p, c_o)/2, t_o))
+                else VehículosTotalesPorCabina(p, t_o, c_o)
+        VehículosTotalesPorCabina(CobrarVehículo(p, c_g), c_o)
+            if c_g = c_o ∧ próximo(ColaEnCabina(p, c_o) = t_o) 
+                    then VehículosTotalesPorCabina(p, t_o, c_o) + 1
+                    else VehículosTotalesPorCabina(p, t_o, c_o)
+
+        DesencolarN(c, n) ≡
+            if n = 0
+                then c
+                else DesencolarN(desencolar(c), n-1)
+
+        VehiculosDeTipoQuePasan(c, n, t) ≡
+            if n = 0
+                then 0
+                else if próximo(c) = t
+                    then 1 + VehiculosDeTipoQuePasan(desencolar(c), n-1, t)
+                    else VehiculosDeTipoQuePasan(desencolar(c), n-1, t)
+
+    Notas:
+        (¹) En clase, cuando hicimos los observadores acá decidimos usar otro observador que se acerca más a lo que pide el enunciado:
+
+                CabinasDondePasaronMasVehiculos: PDZ p × TipoVehículo t → Conjunto(Cabina)
+
+            Para construír ese conjunto, es decir, para axiomatizar este observador, primero hay que recorrer (recursivamente) todas las cabinas para encontrar
+            la máxima cantidad de vehículos que pasaron por alguna cabina y después recorrer de nuevo las cabinas para encontrar todas las que tienen ese número.
+            Para eso es necesario de todos modos axiomatizar VehículosTotalesPorCabina, aunque la tengamos como una Otra Operación.
+
+        (²) Técnicamente estas operaciones deberían ser extensiones genéricas del TAD Cola.  Si son tan sencillas como este DesencolarN, es válido explicar qué
+            hacen y no escribirlas, pero ante la duda consulten.
+
+
+
